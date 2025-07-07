@@ -1,0 +1,52 @@
+import RPi.GPIO as GPIO 
+import me 
+# ---
+ Pin
+ Defini o
+ ns ---
+ IN1 = 17 # L298N 
+IN1
+ IN2 = 27 # L298N 
+IN2
+ ENA 
+=
+ 18
+       # 
+L298N    
+ENA 
+(PWM)
+ IR_SENSOR = 22 # IR sensor OUT pin # --- 
+GPIO Setup --- 
+GPIO.setmode(GPIO.BCM) GPIO.setup(IN1, 
+GPIO.OUT) GPIO.setup(IN2, GPIO.OUT) 
+GPIO.setup(ENA, GPIO.OUT) 
+GPIO.setup(IR_SENSOR, GPIO.IN) 
+# --- PWM Setup --- 
+pwm = GPIO.PWM(ENA, 1000) # 1kHz PWM frequency 
+pwm.start(0) 
+def motor_forward(duty=20): 
+GPIO.output(IN1, GPIO.HIGH) 
+GPIO.output(IN2, GPIO.LOW) 
+pwm.ChangeDutyCycle(duty) 
+34
+def motor_stop(): pwm.ChangeDutyCycle(0) 
+def cleanup(): motor_stop() 
+GPIO.cleanup() 
+try: 
+print(" System started: Motor will stop on black line only...") 
+while True: 
+ir_value = GPIO.input(IR_SENSOR) 
+if ir_value == 0: 
+print(" Black line detected! Stopping for 5 sec...") motor_stop() 
+time.sleep(5) 
+print(" Resuming mo on...") motor_forward(duty=20) 
+# Wait un l black line is gone (IR = 1), to avoid mul ple triggers while 
+GPIO.input(IR_SENSOR) == 0: 
+time.sleep(0.01) 
+else: 
+motor_forward(duty=20) 
+time.sleep(0.01) 
+# Keep moving normally 
+# Small delay to reduce CPU load 
+except KeyboardInterrupt: print(" 
+Stopped by user.") cleanup()
